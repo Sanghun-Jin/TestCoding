@@ -1,30 +1,36 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
-	StyleSheet,
-	Text,
-	View,
 	Button,
-	ScrollView,
+	View,
 	TextInput,
+	ScrollView,
+	StyleSheet,
+	StatusBar,
+	Alert,
 } from 'react-native';
 
-function SetLocationinfo({ navigation }) {
+import Home from './Home';
+
+function setLocationScreen({ navigation, route }) {
 	return (
 		<View style={styles.container}>
+			<StatusBar barStyle={'dark-content'} />
 			<ScrollView>
 				<TextInput
 					style={styles.Input}
 					placeholder={'장소 이름'}
 					autoFocus={true}
 					returnKeyType={'next'}
+					ref={(input) => {
+						this.FirstTextInput = input;
+					}}
 					onSubmitEditing={() => {
 						this.SecondTextInput.focus();
 					}}
-					blurOnSubmit={false}
 				/>
 				<TextInput
 					style={styles.Input}
-					placeholder={'장소 이름'}
+					placeholder={'장소 설명'}
 					returnKeyType={'next'}
 					ref={(input) => {
 						this.SecondTextInput = input;
@@ -32,47 +38,52 @@ function SetLocationinfo({ navigation }) {
 					onSubmitEditing={() => {
 						this.ThirdTextInput.focus();
 					}}
-					blurOnSubmit={false}
 				/>
 				<TextInput
 					style={styles.Input}
-					placeholder={'장소 이름'}
-					returnKeyType={'next'}
+					placeholder={'공유 친구'}
+					returnKeyType={'done'}
 					ref={(input) => {
 						this.ThirdTextInput = input;
 					}}
-					onSubmitEditing={() => {
-						this.FourthTextInput.focus();
-					}}
-					blurOnSubmit={false}
 				/>
-				<TextInput
-					style={styles.Input}
-					placeholder={'장소 이름'}
-					returnKeyType={'next'}
-					ref={(input) => {
-						this.FourthTextInput = input;
-					}}
-					onSubmitEditing={() => {
-						this.FifthTextInput.focus();
-					}}
-					blurOnSubmit={false}
-				/>
-				<TextInput
-					style={styles.Input}
-					placeholder={'장소 이름'}
-					returnKeyType={'done'}
-					ref={(input) => {
-						this.FifthTextInput = input;
-					}}
-				/>
+				<TextInput style={styles.Input} editable={false}>
+					{route.params.coordinate[0]}
+				</TextInput>
+				<TextInput style={styles.Input} editable={false}>
+					{route.params.coordinate[1]}
+				</TextInput>
 			</ScrollView>
-			<Button title="완료" onPress={() => navigation.navigate('First')} />
+			<Button
+				title="완료"
+				onPress={() =>
+					onSubmit(
+						navigation,
+						route.params.coordinate[0],
+						route.params.coordinate[1],
+					)
+				}
+			/>
 		</View>
 	);
 }
 
-export default SetLocationinfo;
+function onSubmit(navigation, lati, long) {
+	const map = new Home();
+	map.setState({
+		markers: [
+			...map.state.markers,
+			{
+				coordinate: { latitude: lati, longitude: long },
+				title: 'asd',
+				description: 'asd',
+			},
+		],
+	});
+	navigation.goBack();
+}
+
+export default setLocationScreen;
 
 const styles = StyleSheet.create({
 	container: {
