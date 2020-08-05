@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
 	Button,
 	View,
@@ -11,76 +11,77 @@ import {
 
 import Home from './Home';
 
-function setLocationScreen({ navigation, route }) {
-	return (
-		<View style={styles.container}>
-			<StatusBar barStyle={'dark-content'} />
-			<ScrollView>
-				<TextInput
-					style={styles.Input}
-					placeholder={'장소 이름'}
-					autoFocus={true}
-					returnKeyType={'next'}
-					ref={(input) => {
-						this.FirstTextInput = input;
-					}}
-					onSubmitEditing={() => {
-						this.SecondTextInput.focus();
-					}}
+class setLocationScreen extends Component {
+	render() {
+		return (
+			<View style={styles.container}>
+				<StatusBar barStyle={'dark-content'} />
+				<ScrollView>
+					<TextInput
+						style={styles.Input}
+						placeholder={'장소 이름'}
+						autoFocus={true}
+						returnKeyType={'next'}
+						ref={(input) => {
+							this.FirstTextInput = input;
+						}}
+						onSubmitEditing={() => {
+							this.SecondTextInput.focus();
+						}}
+					/>
+					<TextInput
+						style={styles.Input}
+						placeholder={'장소 설명'}
+						returnKeyType={'next'}
+						ref={(input) => {
+							this.SecondTextInput = input;
+						}}
+						onSubmitEditing={() => {
+							this.ThirdTextInput.focus();
+						}}
+					/>
+					<TextInput
+						style={styles.Input}
+						placeholder={'공유 친구'}
+						returnKeyType={'done'}
+						ref={(input) => {
+							this.ThirdTextInput = input;
+						}}
+					/>
+					<TextInput style={styles.Input} editable={false}>
+						{this.props.route.params.coordinate[0]}
+					</TextInput>
+					<TextInput style={styles.Input} editable={false}>
+						{this.props.route.params.coordinate[1]}
+					</TextInput>
+				</ScrollView>
+				<Button
+					title="완료"
+					onPress={() =>
+						this.onSubmit(
+							this.props.route.params.coordinate[0],
+							this.props.route.params.coordinate[1],
+						)
+					}
 				/>
-				<TextInput
-					style={styles.Input}
-					placeholder={'장소 설명'}
-					returnKeyType={'next'}
-					ref={(input) => {
-						this.SecondTextInput = input;
-					}}
-					onSubmitEditing={() => {
-						this.ThirdTextInput.focus();
-					}}
-				/>
-				<TextInput
-					style={styles.Input}
-					placeholder={'공유 친구'}
-					returnKeyType={'done'}
-					ref={(input) => {
-						this.ThirdTextInput = input;
-					}}
-				/>
-				<TextInput style={styles.Input} editable={false}>
-					{route.params.coordinate[0]}
-				</TextInput>
-				<TextInput style={styles.Input} editable={false}>
-					{route.params.coordinate[1]}
-				</TextInput>
-			</ScrollView>
-			<Button
-				title="완료"
-				onPress={() =>
-					onSubmit(
-						navigation,
-						route.params.coordinate[0],
-						route.params.coordinate[1],
-					)
-				}
-			/>
-		</View>
-	);
-}
+			</View>
+		);
+	}
 
-function onSubmit(navigation, lati, long) {
-	const map = new Home();
-	map.setState({
-		markers: [
-			...map.state.markers,
-			{
-				coordinate: { latitude: lati, longitude: long },
-				title: 'asd',
-				description: 'asd',
-			},
-		],
-	});
-	navigation.goBack();
+	onSubmit(lati, long) {
+		const map = new Home();
+		map.setState({
+			markers: [
+				...map.state.markers,
+				{
+					coordinate: { latitude: lati, longitude: long },
+					title: 'asd',
+					description: 'asd',
+				},
+			],
+		});
+		this.props.navigation.goBack();
+	}
 }
 
 export default setLocationScreen;
