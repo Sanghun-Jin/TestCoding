@@ -1,36 +1,32 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, View, Switch } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Switch } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default class Editbar extends Component {
-  state = {
-    switchValue: false,
-    isEditing: false
-  };
-  toggleSwitch = () => {
-    this.setState((preState) => {
-      return {
-        switchValue: !preState.switchValue
-      };
-    });
-  };
-  render() {
-    return (
-      <View style={StyleSheet.container}>
-        <Switch
-          style={{ marginTop: 30 }}
-          onValueChange={this.toggleSwitch}
-          value={this.state.switchValue}
-        />
-      </View>
-    );
-  }
+export default function Editbar() {
+	const dispatch = useDispatch();
+	const { isEditting } = useSelector((state) => ({
+		isEditting: state.isEditting,
+	}));
+	return (
+		<View style={StyleSheet.container}>
+			<Switch
+				style={{ marginTop: 30 }}
+				onValueChange={() =>
+					dispatch({
+						type: 'switching',
+					})
+				}
+				value={isEditting}
+			/>
+		</View>
+	);
 }
 
 const Styles = StyleSheet.create({
-  container: {
-    flex: 3,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
+	container: {
+		flex: 3,
+		backgroundColor: '#fff',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
 });
