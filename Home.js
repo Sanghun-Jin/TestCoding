@@ -1,17 +1,36 @@
-import React, { useReducer } from 'react';
-import { View, StyleSheet, Image, StatusBar } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, Image, StatusBar, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { useSelector, useDispatch } from 'react-redux';
+import * as Location from 'expo-location';
+
 import Editbar from './Editbar';
 import Icon from './Icon';
-import { useSelector } from 'react-redux';
-
+/*
+Location.startLocationUpdatesAsync(taskName, options)
+Location.stopLocationUpdatesAsync(taskName)
+*/
 function Home({ navigation }) {
+	const dispatch = useDispatch();
 	const { markers } = useSelector((state) => ({
 		markers: state.markers,
 	}));
 	const { isEditting } = useSelector((state) => ({
 		isEditting: state.isEditting,
 	}));
+	const { current_location } = useSelector((state) => ({
+		current_location: state.current_location,
+	}));
+
+	// Location.watchPositionAsync(() => {
+	// 	const { latitude, longitude } = Location.getCurrentPositionAsync();
+	// 	dispatch({
+	// 		type: 'changeLocation',
+	// 		latitude: latitude,
+	// 		longitude: longitude,
+	// 	});
+	// });
+
 	return (
 		<View style={styles.container}>
 			<StatusBar barStyle={'dark-content'} />
@@ -22,13 +41,11 @@ function Home({ navigation }) {
 				<MapView
 					style={styles.Map}
 					initialRegion={{
-						latitude: 37.258355,
-						longitude: 127.03145842,
+						latitude: current_location.latitude,
+						longitude: current_location.longitude,
 						latitudeDelta: 0.0922,
 						longitudeDelta: 0.0421,
 					}}
-					showsUserLocation
-					followsUserLocation
 					provider={'google'}
 					onPress={(e) => {
 						if (isEditting) {
@@ -41,6 +58,22 @@ function Home({ navigation }) {
 						}
 					}}
 				>
+					<Marker
+						coordinate={{
+							latitude: current_location.latitude,
+							longitude: current_location.longitude,
+						}}
+					>
+						<View style={styles.marker}>
+							<Image
+								style={styles.markImage}
+								source={require('./assets/Image/Icon/MapMarker.png')}
+							/>
+						</View>
+						<View style={styles.namebar}>
+							<Text style={styles.nametext}>나</Text>
+						</View>
+					</Marker>
 					{markers.map((marker) => {
 						return (
 							<Marker
@@ -103,5 +136,15 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		justifyContent: 'center',
+	},
+	namebar: {
+		width: 50,
+		height: 20,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: 'white',
+	},
+	nametext: {
+		color: 'blue',
 	},
 });

@@ -1,62 +1,57 @@
-import Expo from "expo";
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  KeyboardAvoidingView,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-const io = require("socket.io-client");
+/*
+설치 모듈
+@react-navigation/native
+@react-navigation/stack
+react-native-gesture-handler
+react-native-screens
+@react-native-community/masked-view
+redux
+react-redux
+expo-location
+*/
 
-// Replace this URL with your own, if you want to run the backend locally!
-const SocketEndpoint = "https://server0501.herokuapp.com/";
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { useDispatch } from 'react-redux';
 
-export default class App extends React.Component {
-  state = {
-    isConnected: false,
-    data: null,
-  };
-  componentDidMount() {
-    const socket = io(SocketEndpoint, {
-      transports: ["websocket"],
-    });
+import HomeScreen from './Home';
+import setLocationScreen from './SetLocationInfo';
 
-    socket.on("connect", () => {
-      this.setState({ isConnected: true });
-    });
-    socket.on("connection", () => {
-      this.setState({ isConnected: true });
-    });
-    var name = "김만덕";
-    socket.emit("asd", name);
-  }
+import * as Location from 'expo-location';
 
-  render() {
-    return <View style={styles.container}></View>;
-  }
+const Stack = createStackNavigator();
+
+function App() {
+	const dispatch = useDispatch();
+	getLocation = async () => {
+		try {
+			await Location.requestPermissionsAsync();
+			const {
+				coords: { latitude, longitude },
+			} = await Location.getCurrentPositionAsync();
+			dispatch({
+				type: 'changeLocation',
+				latitude: latitude,
+				longitude: longitude,
+			});
+		} catch (error) {
+			alert(
+				'위치정보를 찾지 못했습니다.',
+				'설정에서 위치권한을 허용해 주세요.',
+			);
+		}
+	};
+
+	useEffect(() => getLocation());
+	return (
+		<NavigationContainer>
+			<Stack.Navigator initialRouteName="Home">
+				<Stack.Screen name="Home" component={HomeScreen} />
+				<Stack.Screen name="Linfo" component={setLocationScreen} />
+			</Stack.Navigator>
+		</NavigationContainer>
+	);
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  input: {
-    height: 40,
-    width: 170,
-    borderColor: "gray",
-  },
-  sendbtn: {
-    height: 40,
-    width: 45,
-    backgroundColor: "blue",
-  },
-  textbar: {
-    height: 45,
-  },
-});
+export default App;
